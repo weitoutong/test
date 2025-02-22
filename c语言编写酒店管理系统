@@ -1,0 +1,172 @@
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+#include<time.h>               /*随机数所需头文件*/
+#define N 8                    /*宏定义房间数*/ 
+struct room{
+	int num;                   /*房间号101到100+N*/
+	char name[20];
+	char phone_number[20];
+	int isbooked;                /*已预定为1，未预定为0*/
+	struct room *next;            /*链表*/
+}a[N];
+void screen()                    /*菜单打印函数*/
+{
+	printf("\t\t*********************************************\n");
+	printf("\t\t*********************************************\n");
+	printf("\n");
+	printf("\t\t\t酒店入住系统:\n");
+	printf("\t\t\t(输入对应序号执行相应工作)\n");
+	printf("\t\t\t(1)新客入住\n");
+	printf("\t\t\t(2)取消预订\n");
+	printf("\t\t\t(3)查询房间预定情况\n");
+	printf("\t\t\t(4)查询客人对应房间号\n");
+	printf("\t\t\t(5)显示所有房间预定情况\n");
+	printf("\n");
+	printf("\t\t*********************************************\n");
+	printf("\t\t*********************************************\n");
+}
+void fuction1()
+{
+	printf("\t\t\t 正在查找分配空房间......\n");
+	srand(time(NULL));                 /*随机数所需语句*/
+	int t=0,n,i,x=0,m=0;
+    while(x==0)                        /*分配空房间*/
+    {
+    	for(i=0;i<N;i++)                 /*先考虑特殊情况：无空房间*/
+    	{
+    		if(a[i].isbooked==1)
+    		m++;
+		}
+		if(m==8)
+		printf("\t\t\t 所以房间都已被预定，无空房间！");
+        t=rand()%8;                     /*正常情况：有空房间*/
+    	n=101+t;                        /*随机生成房间号*/
+	   for(i=0;i<N;i++)
+	   {
+		    if(a[i].num==n)
+	    	{
+			   if(a[i].isbooked==0)
+			   {
+			    	a[i].isbooked=1;
+				    x=1;
+				    printf("\t\t\t 请输入客人的姓名:");
+				    getchar();
+				    gets(a[i].name);
+				    printf("\t\t\t 请输入客人的联系方式:");
+				    scanf("%s",a[i].phone_number);
+				    printf("\t\t\t %d号房间成功被%s客人预定",a[i].num,a[i].name);
+				    break;
+			   }
+			    else break;
+		    }
+	    }
+	}
+}
+void fuction2()
+{
+	int x;
+	printf("\t\t\t 请输入取消预定的房间号:");
+	scanf("%d",&x);
+	int t=x-101;
+	if(a[t].isbooked==1) 
+	{
+		strcpy(a[t].name," ");
+	    strcpy(a[t].phone_number," ");
+	    a[t].isbooked=0;
+	    printf("\t\t\t %d号房间已成功取消预订",x);
+	}
+	else
+	printf("\t\t\t %d号房间无人预订，取消预订失败",x);
+}
+void fuction3()
+{
+	printf("\t\t\t 请输入想查询预定情况的房间号:");
+	int x;
+	scanf("%d",&x);
+	int t=x-101;
+	if(a[t].isbooked==1)
+	{
+		printf("\t\t\t %d号房间已经被%s客人预定，联系方式是%s",x,a[t].name,a[t].phone_number);
+	}
+	else
+	printf("\t\t\t %d号房间无人预定",x);
+}
+void fuction4()
+{
+	int i;
+	printf("\t\t\t 请输入想查询房间号的客人消息(姓名或联系方式):");
+	char str[20];
+	getchar();
+	gets(str);
+	for(i=0;i<N;i++)
+	{
+		if(!strcmp(str,a[i].name)||!strcmp(str,a[i].phone_number))
+		printf("\t\t\t 该客人预定的房间号为%d",a[i].num);
+	}
+}
+void fuction5()
+{
+	int i;
+	printf("\t\t\t 所有房间的预定状态为:\n");
+	for(i=0;i<N;i++)
+	{
+		printf("\t\t\t ");
+		printf("房间号  :");
+		printf("%-5d",a[i].num);
+		printf("\n"); 
+		printf("\t\t\t ");
+		printf("预定状态:");
+		if(a[i].isbooked==1) 
+		printf("已预定     ");
+		else
+		printf("未预定     "); 
+		printf("\n"); 
+	}
+}
+int main()
+{
+	int x,y=0,i;
+	struct room *head=a,*tail=a+N-1,*p=a;         /*制作链表*/ 
+	for(i=0;i<N-1;i++)                          /*链表链接*/
+	{
+		a[i].next=&a[i+1];
+	}
+	a[N-1].next=NULL;
+	for(i=0;i<N;i++)                            /*房间号设置*/
+	{
+		a[i].num=101+i;
+	}
+	screen();
+	int h=0;
+	char str[20]; 
+	while(y==0)
+	{
+		printf("\n");
+	printf("\t\t\t 请输入操作序号(输入0退出)：");
+	scanf("%d",&x);
+	switch(x)
+	{
+		case 0:printf("\t\t\t 结束");y++;break;
+		case 1:while(h==0)
+		{
+			fuction1();
+			printf("\n\n\t\t\t 是否继续输入（是/否）：");
+			scanf("%s",str);
+			if(strcmp(str,"是")) 
+			h++;
+		 } 
+		break;
+		case 2:fuction2();
+		break;
+		case 3:fuction3();
+		break;
+		case 4:fuction4();
+		break;
+		case 5:fuction5();
+		break;
+		default :printf("\t\t\t 输入有误，请重新输入序号!");
+	}
+	}
+	return 0;
+ }
